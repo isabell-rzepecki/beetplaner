@@ -100,8 +100,10 @@
   </main>
 </div>
 
-<!-- ─── Modal Overlay ──────────────────────────────────────────── -->
-<div id="modal-overlay">
+<!-- ─── Modal Overlay (nur Backdrop, keine Kinder) ─────────────── -->
+<div id="modal-overlay"></div>
+
+<!-- ─── Modals (Geschwister des Overlays, kein Bubbling-Problem) ── -->
 
   <!-- Beet anlegen / bearbeiten -->
   <div id="modal-beet-form" class="modal">
@@ -209,8 +211,6 @@
       <button class="btn-primary" onclick="App.duengungFormSpeichern()">Speichern</button>
     </div>
   </div>
-
-</div>
 
 <!-- ─── Scripts ─────────────────────────────────────────────── -->
 <script src="data/pflanzendaten.js"></script>
