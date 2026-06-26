@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - claude/garden-bed-planner-app-2oml1o
   workflow_dispatch:
 
 permissions:
