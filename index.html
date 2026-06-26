@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beetplaner 🌱</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ─── Header & Navigation ─────────────────────────────────── -->
+  <header>
+    <h1><span>🌱</span> Beetplaner</h1>
+    <nav>
+      <button class="nav-btn aktiv" data-bereich="dashboard">Garten</button>
+      <button class="nav-btn" data-bereich="beete">Beete</button>
+      <button class="nav-btn" data-bereich="planung">Saisonplanung</button>
+      <button class="nav-btn" data-bereich="timeline">Zeitplan</button>
+      <button class="nav-btn" data-bereich="wetter">Wetter</button>
+    </nav>
+    <div class="header-aktionen">
+      <button class="btn-export" onclick="App.exportiereJSON()" title="Daten exportieren">⬇ Export</button>
+      <button class="btn-export" onclick="App.importiereJSON()" title="Daten importieren">⬆ Import</button>
+    </div>
+  </header>
+
+  <!-- ─── Hauptinhalt ────────────────────────────────────────── -->
+  <main>
+
+    <!-- ═══ Dashboard ═══════════════════════════════════════════ -->
+    <div id="bereich-dashboard" class="bereich aktiv">
+      <div class="bereich-header">
+        <h2>Mein Garten</h2>
+        <button class="btn-primary" onclick="App.neuesBeetDialog()">+ Neues Beet</button>
+      </div>
+      <div id="dashboard-warnungen"></div>
+      <div class="dashboard-grid">
+        <div>
+          <div id="gartenplan-grid"></div>
+        </div>
+        <div class="dashboard-sidebar">
+          <h3>📅 Nächste 14 Tage</h3>
+          <div id="dashboard-termine"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Beete-Übersicht ══════════════════════════════════════ -->
+    <div id="bereich-beete" class="bereich">
+      <div class="bereich-header">
+        <h2>Beet-Verwaltung</h2>
+        <button class="btn-primary" onclick="App.neuesBeetDialog()">+ Neues Beet</button>
+      </div>
+      <div id="beeteliste-container"></div>
+    </div>
+
+    <!-- ═══ Saisonplanung ════════════════════════════════════════ -->
+    <div id="bereich-planung" class="bereich">
+      <div class="bereich-header">
+        <h2>Saisonplanung</h2>
+      </div>
+      <div class="planung-layout">
+        <div class="wunschliste-karte">
+          <h3>Wunschliste für <span id="planung-jahr"></span></h3>
+          <div class="wunsch-eingabe">
+            <input type="text" id="wunsch-input" list="kulturen-liste-planung"
+              placeholder="Kultur eingeben…"
+              onkeydown="if(event.key==='Enter') App.wunschlisteHinzufuegen()" />
+            <datalist id="kulturen-liste-planung"></datalist>
+            <button class="btn-primary" onclick="App.wunschlisteHinzufuegen()">+</button>
+          </div>
+          <div id="wunschliste-chips"></div>
+          <button class="btn-primary" style="width:100%" onclick="App.berechnePlanung()">
+            Optimale Zuteilung berechnen →
+          </button>
+        </div>
+        <div id="planung-ergebnis"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Timeline ═════════════════════════════════════════════ -->
+    <div id="bereich-timeline" class="bereich">
+      <div class="bereich-header">
+        <h2>Jahres-Zeitplan</h2>
+      </div>
+      <div class="timeline-wrapper">
+        <div id="timeline-container"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Wetter ═══════════════════════════════════════════════ -->
+    <div id="bereich-wetter" class="bereich">
+      <div class="bereich-header">
+        <h2>Wetter & Standort</h2>
+      </div>
+      <div id="wetter-container"></div>
+    </div>
+
+  </main>
+
+  <!-- ─── Footer ──────────────────────────────────────────────── -->
+  <footer>
+    <p>🐱 🐱 🐱</p>
+  </footer>
+</div>
+
+<!-- ─── Modal Overlay (nur Backdrop, keine Kinder) ─────────────── -->
+<div id="modal-overlay"></div>
+
+<!-- ─── Modals (Geschwister des Overlays, kein Bubbling-Problem) ── -->
+
+  <!-- Beet anlegen / bearbeiten -->
+  <div id="modal-beet-form" class="modal">
+    <div class="modal-header">
+      <h3 id="modal-beet-titel">Neues Beet anlegen</h3>
+      <button class="modal-schliessen" onclick="App.schliesseModal()">✕</button>
+    </div>
+    <input type="hidden" id="form-beet-id" />
+    <div class="form-gruppe">
+      <label for="form-beet-name">Name des Beetes</label>
+      <input type="text" id="form-beet-name" placeholder="z.B. Hochbeet Nord" />
+    </div>
+    <div class="form-gruppe">
+      <label for="form-beet-ausrichtung">Ausrichtung / Lichtbedingungen</label>
+      <select id="form-beet-ausrichtung">
+        <option value="sonnig">☀️ Sonnig (6+ Stunden Sonne)</option>
+        <option value="halbschattig">⛅ Halbschattig (3–6 Stunden)</option>
+        <option value="schattig">🌑 Schattig (unter 3 Stunden)</option>
+      </select>
+    </div>
+    <div class="form-gruppe">
+      <label for="form-beet-groesse">Größe in m² (optional)</label>
+      <input type="number" id="form-beet-groesse" placeholder="z.B. 4.5" min="0.1" step="0.1" />
+    </div>
+    <div class="form-aktionen">
+      <button class="btn-secondary" onclick="App.schliesseModal()">Abbrechen</button>
+      <button class="btn-primary" onclick="App.beetFormSpeichern()">Speichern</button>
+    </div>
+  </div>
+
+  <!-- Beet-Detail -->
+  <div id="modal-beet-detail" class="modal modal-beet-detail">
+    <div class="modal-header">
+      <h3 id="beet-detail-titel">Beet</h3>
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <button class="btn-sm" onclick="App.beetBearbeitenDialog(App._aktiveBeetId())">✏️ Bearbeiten</button>
+        <button class="modal-schliessen" onclick="App.schliesseModal()">✕</button>
+      </div>
+    </div>
+
+    <div class="modal-tabs">
+      <button class="modal-tab aktiv" onclick="App.tabWechseln(this,'tab-historie')">📋 Historie</button>
+      <button class="modal-tab" onclick="App.tabWechseln(this,'tab-fruchtfolge')">🔄 Fruchtfolge</button>
+      <button class="modal-tab" onclick="App.tabWechseln(this,'tab-mischkultur')">🌿 Mischkultur</button>
+    </div>
+
+    <div id="tab-historie" class="modal-tab-inhalt aktiv">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:0.75rem;">
+        <button class="btn-primary" onclick="App.historieHinzufuegenDialog()">+ Anbau eintragen</button>
+      </div>
+      <div id="beet-historie-inhalt"></div>
+    </div>
+
+    <div id="tab-fruchtfolge" class="modal-tab-inhalt">
+      <div id="beet-fruchtfolge-hinweise"></div>
+    </div>
+
+    <div id="tab-mischkultur" class="modal-tab-inhalt">
+      <div id="beet-mischkultur-inhalt"></div>
+    </div>
+  </div>
+
+  <!-- Historie-Eintrag hinzufügen -->
+  <div id="modal-historie-form" class="modal">
+    <div class="modal-header">
+      <h3>Anbau eintragen – <span id="form-historie-beet"></span></h3>
+      <button class="modal-schliessen" onclick="App.schliesseModal()">✕</button>
+    </div>
+    <div class="form-gruppe">
+      <label for="form-historie-jahr">Jahr</label>
+      <input type="number" id="form-historie-jahr" min="2000" max="2100" />
+    </div>
+    <div class="form-gruppe">
+      <label for="form-historie-kultur">Kultur</label>
+      <input type="text" id="form-historie-kultur" list="kulturen-liste" placeholder="z.B. Tomate" />
+      <datalist id="kulturen-liste"></datalist>
+    </div>
+    <div class="form-aktionen">
+      <button class="btn-secondary" onclick="App.schliesseModal()">Abbrechen</button>
+      <button class="btn-primary" onclick="App.historieFormSpeichern()">Speichern</button>
+    </div>
+  </div>
+
+  <!-- Düngung hinzufügen -->
+  <div id="modal-duengung-form" class="modal">
+    <div class="modal-header">
+      <h3>Düngung erfassen</h3>
+      <button class="modal-schliessen" onclick="App.schliesseModal()">✕</button>
+    </div>
+    <input type="hidden" id="form-duengung-beet-id" />
+    <input type="hidden" id="form-duengung-eintrag-id" />
+    <div class="form-gruppe">
+      <label for="form-duengung-typ">Dünger-Typ</label>
+      <input type="text" id="form-duengung-typ" list="duenger-liste"
+        placeholder="z.B. Hornspäne" oninput="App.zeigeDuengerInfo()" />
+      <datalist id="duenger-liste"></datalist>
+      <div id="duengung-info"></div>
+    </div>
+    <div class="form-gruppe">
+      <label for="form-duengung-datum">Datum</label>
+      <input type="date" id="form-duengung-datum" />
+    </div>
+    <div class="form-aktionen">
+      <button class="btn-secondary" onclick="App.schliesseModal()">Abbrechen</button>
+      <button class="btn-primary" onclick="App.duengungFormSpeichern()">Speichern</button>
+    </div>
+  </div>
+
+<!-- ─── Scripts ─────────────────────────────────────────────── -->
+<script src="data/pflanzendaten.js"></script>
+<script src="data/klimazonen.js"></script>
+<script src="modules/beete.js"></script>
+<script src="modules/fruchtfolge.js"></script>
+<script src="modules/timeline.js"></script>
+<script src="modules/wetter.js"></script>
+<script src="app.js"></script>
+
+<script>
+// Tab-Wechsel für Beet-Detail Modal
+App.tabWechseln = function(btn, tabId) {
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('aktiv'));
+  document.querySelectorAll('.modal-tab-inhalt').forEach(t => t.classList.remove('aktiv'));
+  btn.classList.add('aktiv');
+  document.getElementById(tabId).classList.add('aktiv');
+};
+
+// Zugriff auf aktive Beet-ID für Bearbeiten-Button im Modal-Header
+App._aktiveBeetId = function() { return App._beetId; };
+const _orig = App.zeigeBeetDetail;
+App.zeigeBeetDetail = function(id) { App._beetId = id; _orig(id); };
+
+// Planungs-Jahr anzeigen
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('planung-jahr').textContent = new Date().getFullYear();
+});
+</script>
+</body>
+</html>
