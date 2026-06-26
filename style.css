@@ -1,0 +1,644 @@
+/* ─── Reset & Variablen ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f4f6f0;
+  --surface: #ffffff;
+  --surface2: #f9fafb;
+  --border: #dde3d8;
+  --text: #1a2410;
+  --text-muted: #6b7a5e;
+  --gruen: #3a7d2c;
+  --gruen-hell: #e8f5e2;
+  --gruen-dunkel: #2a5d1f;
+  --sonnig: #f5a623;
+  --halbschattig: #7bb3c8;
+  --schattig: #6b7a8d;
+  --warnung: #e65c00;
+  --fehler: #c62828;
+  --gut: #2e7d32;
+  --radius: 10px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-hover: 0 4px 16px rgba(0,0,0,0.14);
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+
+header {
+  background: var(--gruen);
+  color: white;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 56px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header h1 { font-size: 1.2rem; font-weight: 700; white-space: nowrap; }
+header h1 span { font-size: 1.3em; }
+
+nav { display: flex; gap: 0.25rem; flex: 1; }
+
+.nav-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.8);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+.nav-btn.aktiv { background: rgba(255,255,255,0.25); color: white; font-weight: 700; }
+
+.header-aktionen { display: flex; gap: 0.5rem; margin-left: auto; }
+.btn-export {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+}
+.btn-export:hover { background: rgba(255,255,255,0.25); }
+
+main { flex: 1; padding: 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+/* ─── Bereiche ───────────────────────────────────────────────────────────── */
+.bereich { display: none; }
+.bereich.aktiv { display: block; }
+
+.bereich-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.bereich-header h2 { font-size: 1.4rem; color: var(--gruen-dunkel); }
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--gruen);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--gruen-dunkel); }
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--gruen);
+  border: 2px solid var(--gruen);
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.btn-secondary:hover { background: var(--gruen-hell); }
+
+.btn-sm {
+  background: var(--gruen-hell);
+  color: var(--gruen-dunkel);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+}
+.btn-sm:hover { background: var(--gruen); color: white; }
+
+.btn-sm.btn-gefahr { background: #fde8e8; color: var(--fehler); border-color: #f5c6c6; }
+.btn-sm.btn-gefahr:hover { background: var(--fehler); color: white; }
+
+.btn-sm.btn-uebernehmen { background: var(--gruen); color: white; margin-top: 0.5rem; }
+.btn-sm.btn-uebernehmen:hover { background: var(--gruen-dunkel); }
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  transition: background 0.1s;
+}
+.btn-icon:hover { background: var(--gruen-hell); }
+.btn-icon.btn-gefahr:hover { background: #fde8e8; }
+
+.btn-tiny {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  margin-left: 0.3rem;
+  opacity: 0.6;
+  padding: 0 0.2rem;
+}
+.btn-tiny:hover { opacity: 1; }
+
+.btn-link { background: none; border: none; color: var(--gruen); cursor: pointer; text-decoration: underline; font-size: inherit; }
+
+/* ─── Gartenplan Dashboard ───────────────────────────────────────────────── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+#gartenplan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.beet-karte {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem;
+  cursor: pointer;
+  border: 3px solid var(--border);
+  transition: all 0.2s;
+  box-shadow: var(--shadow);
+}
+.beet-karte:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+
+.ausrichtung-sonnig .beet-karte,
+.beet-karte.ausrichtung-sonnig { border-color: var(--sonnig); background: linear-gradient(135deg, #fffbf0, #fff8e6); }
+.ausrichtung-halbschattig .beet-karte,
+.beet-karte.ausrichtung-halbschattig { border-color: var(--halbschattig); background: linear-gradient(135deg, #f0f7fa, #e6f2f7); }
+.ausrichtung-schattig .beet-karte,
+.beet-karte.ausrichtung-schattig { border-color: var(--schattig); background: linear-gradient(135deg, #f4f5f6, #eaecee); }
+
+.beet-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem; }
+.beet-ausrichtung { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+.beet-groesse { font-size: 0.8rem; color: var(--text-muted); }
+.beet-kulturen { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
+
+.kultur-chip {
+  background: var(--gruen);
+  color: white;
+  border-radius: 20px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.leer-chip {
+  background: var(--border);
+  color: var(--text-muted);
+  border-radius: 20px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.75rem;
+}
+.leer-grid { color: var(--text-muted); padding: 2rem; text-align: center; }
+
+/* ─── Termine / Sidebar ──────────────────────────────────────────────────── */
+.dashboard-sidebar h3 { font-size: 1rem; margin-bottom: 1rem; color: var(--gruen-dunkel); }
+.dashboard-sidebar { display: flex; flex-direction: column; gap: 1rem; }
+
+.termin-karte {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  box-shadow: var(--shadow);
+}
+.termin-datum { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; min-width: 50px; }
+.termin-info { display: flex; flex-direction: column; gap: 0.1rem; }
+.termin-info strong { font-size: 0.875rem; }
+.termin-beet { font-size: 0.75rem; color: var(--text-muted); }
+
+.warnung-karte {
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+}
+.warnung-karte.frost { background: #e8f4fd; border: 1px solid #90caf9; color: #1565c0; }
+.warnung-karte.boden { background: #fff3e0; border: 1px solid #ffb74d; color: #e65100; }
+.warnung-karte.info { background: var(--gruen-hell); border: 1px solid #a5d6a7; color: var(--gruen-dunkel); }
+.frost-beete { margin-top: 0.4rem; font-weight: 600; }
+
+/* ─── Beetliste ──────────────────────────────────────────────────────────── */
+.beet-liste-item {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.75rem;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  border-left: 5px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: all 0.15s;
+}
+.beet-liste-item:hover { box-shadow: var(--shadow-hover); }
+.beet-liste-item.ausrichtung-sonnig { border-left-color: var(--sonnig); }
+.beet-liste-item.ausrichtung-halbschattig { border-left-color: var(--halbschattig); }
+.beet-liste-item.ausrichtung-schattig { border-left-color: var(--schattig); }
+
+.beet-liste-info { display: flex; flex-direction: column; gap: 0.2rem; }
+.beet-liste-info strong { font-size: 1rem; }
+.beet-liste-info span { font-size: 0.8rem; color: var(--text-muted); }
+
+.beet-liste-historie { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.historie-chip { background: var(--gruen-hell); color: var(--gruen-dunkel); border-radius: 20px; padding: 0.15rem 0.5rem; font-size: 0.75rem; }
+.mehr { font-size: 0.75rem; color: var(--text-muted); }
+
+.beet-liste-aktionen { display: flex; gap: 0.3rem; }
+
+/* ─── Modal ──────────────────────────────────────────────────────────────── */
+#modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+}
+#modal-overlay.sichtbar { display: block; }
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 201;
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 1.5rem;
+  width: calc(100% - 2rem);
+  max-width: 680px;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+}
+.modal.sichtbar { display: block; }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { font-size: 1.15rem; color: var(--gruen-dunkel); }
+.modal-schliessen {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  line-height: 1;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+.modal-schliessen:hover { background: var(--gruen-hell); }
+
+.modal-beet-detail { max-width: 760px; }
+
+.modal-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
+.modal-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  transition: all 0.15s;
+}
+.modal-tab.aktiv, .modal-tab:hover { color: var(--gruen); border-bottom-color: var(--gruen); }
+
+.modal-tab-inhalt { display: none; }
+.modal-tab-inhalt.aktiv { display: block; }
+
+/* ─── Formular-Elemente ──────────────────────────────────────────────────── */
+.form-gruppe { margin-bottom: 1rem; }
+.form-gruppe label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.3rem; color: var(--text-muted); }
+.form-gruppe input, .form-gruppe select, .form-gruppe textarea {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color 0.15s;
+}
+.form-gruppe input:focus, .form-gruppe select:focus {
+  outline: none;
+  border-color: var(--gruen);
+  box-shadow: 0 0 0 3px rgba(58,125,44,0.12);
+}
+
+.form-aktionen { display: flex; gap: 0.75rem; margin-top: 1.25rem; justify-content: flex-end; }
+
+#duengung-info {
+  display: none;
+  background: var(--gruen-hell);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--gruen-dunkel);
+  margin-top: 0.3rem;
+}
+
+/* ─── Historie-Einträge ──────────────────────────────────────────────────── */
+.historie-eintrag {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--border);
+}
+.historie-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.historie-jahr { font-weight: 700; font-size: 0.95rem; color: var(--gruen-dunkel); min-width: 40px; }
+.kultur-badge { background: var(--gruen); color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem; }
+.familie-badge { background: var(--gruen-hell); color: var(--gruen-dunkel); padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; }
+.historie-aktionen { margin-left: auto; display: flex; gap: 0.3rem; }
+
+.duengung-liste { margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.duengung-chip {
+  background: #f3e5f5;
+  border: 1px solid #ce93d8;
+  color: #6a1b9a;
+  padding: 0.2rem 0.5rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Fruchtfolge / Empfehlungen ─────────────────────────────────────────── */
+.empfehlung-karte, .zuteilung-karte {
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+}
+.score-gut { border-color: #a5d6a7; background: #f1f8f1; }
+.score-mittel { border-color: #ffcc80; background: #fffbf3; }
+.score-schlecht { border-color: #ef9a9a; background: #fff5f5; }
+
+.empfehlung-header, .zuteilung-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+.score-badge {
+  background: var(--gruen);
+  color: white;
+  border-radius: 20px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: auto;
+}
+.score-schlecht .score-badge { background: var(--fehler); }
+.score-mittel .score-badge { background: #e65100; }
+
+.hinweis-warnung { color: #b71c1c; font-size: 0.8rem; margin-top: 0.2rem; }
+.hinweis-info { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.1rem; }
+
+.zuteilung-beet { font-weight: 700; font-size: 1rem; }
+.pfeil { color: var(--text-muted); }
+.zuteilung-kultur { color: var(--gruen-dunkel); font-weight: 700; }
+.zuteilung-liste { margin-bottom: 1rem; }
+.nicht-zugeteilt { background: #fff3e0; border: 1px solid #ffb74d; border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.875rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+
+/* ─── Mischkultur ────────────────────────────────────────────────────────── */
+.mischkultur-score { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-muted); }
+.warnung-mischkultur { color: var(--fehler); background: #fde8e8; border-radius: 6px; padding: 0.3rem 0.6rem; margin: 0.3rem 0; font-size: 0.85rem; }
+.gut-mischkultur { color: var(--gut); background: var(--gruen-hell); border-radius: 6px; padding: 0.3rem 0.6rem; margin: 0.3rem 0; font-size: 0.85rem; }
+
+.nachbarn-liste { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+.nachbar-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 0.2rem 0.6rem; font-size: 0.8rem; }
+.nachbar-chip.in-wunschliste { background: var(--gruen-hell); border-color: var(--gruen); color: var(--gruen-dunkel); font-weight: 600; }
+
+/* ─── Saisonplanung ──────────────────────────────────────────────────────── */
+.planung-layout { display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; align-items: start; }
+
+.wunschliste-karte {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+.wunschliste-karte h3 { margin-bottom: 1rem; font-size: 1rem; color: var(--gruen-dunkel); }
+
+.wunsch-eingabe { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+.wunsch-eingabe input { flex: 1; padding: 0.45rem 0.7rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.875rem; }
+.wunsch-eingabe input:focus { outline: none; border-color: var(--gruen); }
+
+#wunschliste-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; min-height: 36px; margin-bottom: 1rem; }
+.wunsch-chip {
+  background: var(--gruen-hell);
+  border: 1px solid var(--gruen);
+  color: var(--gruen-dunkel);
+  border-radius: 20px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ─── Timeline ───────────────────────────────────────────────────────────── */
+.timeline-wrapper {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+
+.timeline-header {
+  display: flex;
+  margin-bottom: 0.25rem;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.timeline-beet-col {
+  width: 180px;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding-right: 0.5rem;
+}
+.timeline-beet-col:hover { color: var(--gruen); }
+
+.timeline-monat {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.timeline-zeile {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  border-bottom: 1px solid var(--border);
+}
+
+.timeline-balken-bereich {
+  flex: 1;
+  position: relative;
+  height: 28px;
+}
+
+.timeline-balken {
+  position: absolute;
+  height: 16px;
+  top: 6px;
+  border-radius: 4px;
+  opacity: 0.85;
+  cursor: default;
+  transition: opacity 0.1s;
+  min-width: 4px;
+}
+.timeline-balken:hover { opacity: 1; }
+
+.heute-linie {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(230, 92, 0, 0.7);
+  pointer-events: none;
+  z-index: 2;
+}
+.heute-linie::before {
+  content: 'Heute';
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  color: var(--warnung);
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.timeline-legende {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+.timeline-legende span { padding-left: 0.5rem; }
+
+/* ─── Wetter ─────────────────────────────────────────────────────────────── */
+.standort-eingabe { max-width: 480px; }
+.standort-eingabe h3 { margin-bottom: 0.5rem; }
+.standort-eingabe p { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem; }
+.eingabe-zeile { display: flex; gap: 0.5rem; }
+.eingabe-zeile input { flex: 1; padding: 0.5rem 0.75rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
+.eingabe-zeile input:focus { outline: none; border-color: var(--gruen); }
+
+.standort-info { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.95rem; }
+
+.klimazone-karte { background: var(--gruen-hell); border-radius: 8px; padding: 0.6rem 0.9rem; font-size: 0.875rem; margin-bottom: 1rem; color: var(--gruen-dunkel); }
+
+.wetter-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.wetter-tag {
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.wetter-datum { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+.wetter-icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+.wetter-temp { display: flex; justify-content: center; gap: 0.4rem; font-size: 0.875rem; }
+.temp-max { font-weight: 700; }
+.temp-min { color: var(--text-muted); }
+.wetter-regen { font-size: 0.75rem; color: var(--halbschattig); margin-top: 0.3rem; }
+
+/* ─── Hilfselemente ──────────────────────────────────────────────────────── */
+.leer { color: var(--text-muted); font-style: italic; padding: 1rem 0; }
+.leer-klein { color: var(--text-muted); font-size: 0.8rem; font-style: italic; }
+.loading { color: var(--text-muted); padding: 1rem 0; }
+.fehler { color: var(--fehler); background: #fde8e8; border-radius: 8px; padding: 0.75rem 1rem; }
+
+.karte {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .planung-layout { grid-template-columns: 1fr; }
+  .wetter-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 640px) {
+  header h1 { font-size: 1rem; }
+  nav .nav-btn { padding: 0.35rem 0.5rem; font-size: 0.8rem; }
+  main { padding: 1rem 0.75rem; }
+  .wetter-grid { grid-template-columns: repeat(3, 1fr); }
+  .beet-liste-item { grid-template-columns: 1fr auto; }
+  .beet-liste-historie { display: none; }
+  .timeline-beet-col { width: 110px; }
+}
