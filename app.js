@@ -220,7 +220,10 @@ const App = (() => {
 
   // ─── Dialoge / Modals ────────────────────────────────────────────────────────
   function zeigeModal(id) {
-    document.querySelectorAll('.modal').forEach(m => m.classList.remove('sichtbar'));
+    document.querySelectorAll('.modal').forEach(m => {
+      m.classList.remove('sichtbar');
+      m.onclick = e => e.stopPropagation();
+    });
     const m = document.getElementById(id);
     if (m) m.classList.add('sichtbar');
     document.getElementById('modal-overlay').classList.add('sichtbar');
@@ -660,7 +663,7 @@ const App = (() => {
       btn.addEventListener('click', () => zeigeBereich(btn.dataset.bereich));
     });
     document.getElementById('modal-overlay').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('modal-overlay')) schliesseModal();
+      if (!e.target.closest('.modal')) schliesseModal();
     });
 
     // Vorhandenen Standort laden und Wetter im Hintergrund holen
