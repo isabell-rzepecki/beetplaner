@@ -659,7 +659,9 @@ const App = (() => {
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => zeigeBereich(btn.dataset.bereich));
     });
-    document.getElementById('modal-overlay').addEventListener('click', schliesseModal);
+    document.getElementById('modal-overlay').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('modal-overlay')) schliesseModal();
+    });
 
     // Vorhandenen Standort laden und Wetter im Hintergrund holen
     const standort = Wetter.ladeStandort();
