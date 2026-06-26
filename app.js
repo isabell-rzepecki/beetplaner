@@ -220,15 +220,13 @@ const App = (() => {
 
   // ─── Dialoge / Modals ────────────────────────────────────────────────────────
   function zeigeModal(id) {
-    document.querySelectorAll('.modal').forEach(m => m.classList.remove('sichtbar'));
+    document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('sichtbar'));
     const m = document.getElementById(id);
     if (m) m.classList.add('sichtbar');
-    document.getElementById('modal-overlay').classList.add('sichtbar');
   }
 
   function schliesseModal() {
-    document.querySelectorAll('.modal').forEach(m => m.classList.remove('sichtbar'));
-    document.getElementById('modal-overlay').classList.remove('sichtbar');
+    document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('sichtbar'));
   }
 
   function neuesBeetDialog() {
@@ -659,7 +657,11 @@ const App = (() => {
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => zeigeBereich(btn.dataset.bereich));
     });
-    document.getElementById('modal-overlay').addEventListener('click', schliesseModal);
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+      backdrop.addEventListener('click', e => {
+        if (e.target === backdrop) schliesseModal();
+      });
+    });
 
     // Vorhandenen Standort laden und Wetter im Hintergrund holen
     const standort = Wetter.ladeStandort();
