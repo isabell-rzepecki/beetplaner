@@ -59,10 +59,15 @@
     <div id="bereich-planung" class="bereich">
       <div class="bereich-header">
         <h2>Saisonplanung</h2>
+        <div class="planung-jahr-auswahl">
+          <label for="planung-jahr-select">Jahr:</label>
+          <select id="planung-jahr-select" onchange="App.planungsJahrAendern(this.value)"></select>
+        </div>
       </div>
+      <div id="nachkultur-hinweis"></div>
       <div class="planung-layout">
         <div class="wunschliste-karte">
-          <h3>Wunschliste für <span id="planung-jahr"></span></h3>
+          <h3>Wunschliste</h3>
           <div class="wunsch-eingabe">
             <input type="text" id="wunsch-input" list="kulturen-liste-planung"
               placeholder="Kultur eingeben…"
@@ -241,10 +246,6 @@ App._aktiveBeetId = function() { return App._beetId; };
 const _orig = App.zeigeBeetDetail;
 App.zeigeBeetDetail = function(id) { App._beetId = id; _orig(id); };
 
-// Planungs-Jahr anzeigen
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('planung-jahr').textContent = new Date().getFullYear();
-});
 </script>
 </body>
 </html>
