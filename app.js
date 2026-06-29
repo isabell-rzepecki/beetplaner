@@ -7,6 +7,7 @@ const App = (() => {
   let wunschliste = [];
   let wetterDaten = null;
   const AKTUELLESJAHR = new Date().getFullYear();
+  let planungsJahr = AKTUELLESJAHR;
 
   // ─── Navigation ──────────────────────────────────────────────────────────────
   function zeigeBereich(bereich) {
@@ -220,15 +221,13 @@ const App = (() => {
 
   // ─── Dialoge / Modals ────────────────────────────────────────────────────────
   function zeigeModal(id) {
-    document.querySelectorAll('.modal').forEach(m => m.classList.remove('sichtbar'));
+    document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('sichtbar'));
     const m = document.getElementById(id);
     if (m) m.classList.add('sichtbar');
-    document.getElementById('modal-overlay').classList.add('sichtbar');
   }
 
   function schliesseModal() {
-    document.querySelectorAll('.modal').forEach(m => m.classList.remove('sichtbar'));
-    document.getElementById('modal-overlay').classList.remove('sichtbar');
+    document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('sichtbar'));
   }
 
   function neuesBeetDialog() {
@@ -299,7 +298,7 @@ const App = (() => {
     const familie = kulturaInfo ? kulturaInfo.familie : 'Unbekannt';
 
     BeetManager.historieEintragHinzufuegen(aktiveBeetId, jahr, kulturName, familie);
-    schliesseModal();
+    zeigeModal('modal-beet-detail');
     const beet = BeetManager.getBeet(aktiveBeetId);
     if (beet) {
       renderBeetHistorie(beet);
@@ -334,10 +333,14 @@ const App = (() => {
     if (!typ || !datum) { alert('Bitte Typ und Datum angeben.'); return; }
 
     BeetManager.duengungHinzufuegen(beetId, eintragId, typ, datum);
-    schliesseModal();
     aktiveBeetId = beetId;
+    zeigeModal('modal-beet-detail');
     const beet = BeetManager.getBeet(beetId);
-    if (beet) renderBeetHistorie(beet);
+    if (beet) {
+      renderBeetHistorie(beet);
+      renderFruchtfolgeHinweise(beet);
+      renderMischkulturBereich(beet);
+    }
   }
 
   function duengungLoeschen(beetId, eintragId, duengungId) {
@@ -349,7 +352,64 @@ const App = (() => {
 
   // ─── Saisonplanung ───────────────────────────────────────────────────────────
   function renderPlanung() {
+    // Jahresauswahl befüllen
+    const select = document.getElementById('planung-jahr-select');
+    if (select && select.options.length === 0) {
+      for (let j = AKTUELLESJAHR; j <= AKTUELLESJAHR + 4; j++) {
+        const opt = document.createElement('option');
+        opt.value = j;
+        opt.textContent = j === AKTUELLESJAHR ? `${j} (dieses Jahr)` : j;
+        if (j === planungsJahr) opt.selected = true;
+        select.appendChild(opt);
+      }
+    }
     renderWunschliste();
+    renderNachkulturHinweis();
+  }
+
+  function planungsJahrAendern(jahr) {
+    planungsJahr = parseInt(jahr);
+    document.getElementById('planung-ergebnis').innerHTML = '';
+    renderNachkulturHinweis();
+  }
+
+  // Zeigt für das aktuelle Jahr an welche Kulturen noch gepflanzt werden können
+  function renderNachkulturHinweis() {
+    const container = document.getElementById('nachkultur-hinweis');
+    if (!container) return;
+    if (planungsJahr !== AKTUELLESJAHR) { container.innerHTML = ''; return; }
+
+    const heute = new Date();
+    const monat = heute.getMonth() + 1;
+    if (monat < 6) { container.innerHTML = ''; return; } // Früh im Jahr: kein Hinweis nötig
+
+    const nochPflanzbar = KULTUREN_DB.filter(k => {
+      const fenster = k.pflanzfenster || k.aussaatfenster;
+      if (!fenster) return false;
+      const [em, ed] = fenster.ende.split('-').map(Number);
+      const endeDate = new Date(AKTUELLESJAHR, em - 1, ed);
+      return endeDate >= heute;
+    }).map(k => k.name);
+
+    if (nochPflanzbar.length === 0) { container.innerHTML = ''; return; }
+
+    container.innerHTML = `
+      <div class="nachkultur-box">
+        <strong>🗓️ Jetzt noch pflanzbar (bis Jahresende):</strong>
+        <div class="nachkultur-chips">
+          ${nochPflanzbar.map(n => `
+            <span class="nachbar-chip" title="Zur Wunschliste" style="cursor:pointer"
+              onclick="App.wunschlisteHinzufuegenName('${n}')">${n} +</span>`).join('')}
+        </div>
+        <p class="leer-klein">Klick auf eine Kultur fügt sie zur Wunschliste hinzu.</p>
+      </div>`;
+  }
+
+  function wunschlisteHinzufuegenName(name) {
+    if (!wunschliste.includes(name)) {
+      wunschliste.push(name);
+      renderWunschliste();
+    }
   }
 
   function renderWunschliste() {
@@ -386,13 +446,13 @@ const App = (() => {
     const beete = BeetManager.ladeBeete();
     if (beete.length === 0) { alert('Bitte zuerst Beete anlegen.'); return; }
 
-    const { zuteilung, nichtZugeteilt } = Fruchtfolge.berechneZuteilung(beete, wunschliste, AKTUELLESJAHR);
+    const { zuteilung, nichtZugeteilt } = Fruchtfolge.berechneZuteilung(beete, wunschliste, planungsJahr);
     renderPlanungsErgebnis(zuteilung, nichtZugeteilt);
   }
 
   function renderPlanungsErgebnis(zuteilung, nichtZugeteilt) {
     const container = document.getElementById('planung-ergebnis');
-    let html = '<h3>Planungsvorschlag</h3>';
+    let html = `<h3>Planungsvorschlag ${planungsJahr}</h3>`;
 
     if (zuteilung.length === 0) {
       html += '<p class="leer">Keine Zuteilung möglich.</p>';
@@ -429,8 +489,8 @@ const App = (() => {
   function planungUebernehmen(beetId, kulturName) {
     const kulturaInfo = KULTUREN_DB.find(k => k.name === kulturName);
     const familie = kulturaInfo ? kulturaInfo.familie : 'Unbekannt';
-    BeetManager.historieEintragHinzufuegen(beetId, AKTUELLESJAHR, kulturName, familie);
-    alert(`"${kulturName}" wurde in die Historie von "${BeetManager.getBeet(beetId)?.name}" eingetragen.`);
+    BeetManager.historieEintragHinzufuegen(beetId, planungsJahr, kulturName, familie);
+    alert(`"${kulturName}" (${planungsJahr}) wurde in die Historie von "${BeetManager.getBeet(beetId)?.name}" eingetragen.`);
   }
 
   // ─── Timeline ────────────────────────────────────────────────────────────────
@@ -659,7 +719,11 @@ const App = (() => {
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => zeigeBereich(btn.dataset.bereich));
     });
-    document.getElementById('modal-overlay').addEventListener('click', schliesseModal);
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+      backdrop.addEventListener('click', e => {
+        if (e.target === backdrop) schliesseModal();
+      });
+    });
 
     // Vorhandenen Standort laden und Wetter im Hintergrund holen
     const standort = Wetter.ladeStandort();
@@ -677,7 +741,8 @@ const App = (() => {
     neuesBeetDialog, beetBearbeitenDialog, beetFormSpeichern, beetLoeschenBestaetigen,
     historieHinzufuegenDialog, historieFormSpeichern, historieEintragLoeschen,
     duengungHinzufuegenDialog, duengungFormSpeichern, duengungLoeschen, zeigeDuengerInfo,
-    wunschlisteHinzufuegen, wunschlisteEntfernen, berechnePlanung, planungUebernehmen,
+    wunschlisteHinzufuegen, wunschlisteEntfernen, wunschlisteHinzufuegenName,
+    berechnePlanung, planungUebernehmen, planungsJahrAendern,
     standortSpeichern, standortAendern,
     exportiereJSON, importiereJSON
   };

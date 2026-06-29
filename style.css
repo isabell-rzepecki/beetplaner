@@ -281,32 +281,32 @@ main { flex: 1; padding: 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%;
 .beet-liste-aktionen { display: flex; gap: 0.3rem; }
 
 /* ─── Modal ──────────────────────────────────────────────────────────────── */
-#modal-overlay {
+/* Backdrop: voller Bildschirm, dunkler Hintergrund, zentriert den Kasten  */
+.modal-backdrop {
   display: none;
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.45);
   z-index: 200;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+  overflow-y: auto;
 }
-#modal-overlay.sichtbar { display: block; }
+.modal-backdrop.sichtbar { display: flex; }
 
-.modal {
-  display: none;
-  position: fixed;
-  top: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 201;
+/* Kasten: weißes Formular-Fenster, kein eigenes Positioning nötig */
+.modal-box {
   background: var(--surface);
   border-radius: 14px;
   padding: 1.5rem;
-  width: calc(100% - 2rem);
+  width: 100%;
   max-width: 680px;
-  max-height: calc(100vh - 4rem);
-  overflow-y: auto;
   box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+  position: relative;
+  flex-shrink: 0;
+  margin: auto 0;
 }
-.modal.sichtbar { display: block; }
 
 .modal-header {
   display: flex;
@@ -329,7 +329,7 @@ main { flex: 1; padding: 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%;
 }
 .modal-schliessen:hover { background: var(--gruen-hell); }
 
-.modal-beet-detail { max-width: 760px; }
+.modal-box.modal-beet-detail { max-width: 760px; }
 
 .modal-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
 .modal-tab {
@@ -459,6 +459,36 @@ main { flex: 1; padding: 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%;
 .nachbar-chip.in-wunschliste { background: var(--gruen-hell); border-color: var(--gruen); color: var(--gruen-dunkel); font-weight: 600; }
 
 /* ─── Saisonplanung ──────────────────────────────────────────────────────── */
+.planung-jahr-auswahl {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+.planung-jahr-auswahl select {
+  padding: 0.35rem 0.6rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+.planung-jahr-auswahl select:focus { outline: none; border-color: var(--gruen); }
+
+.nachkultur-box {
+  background: #e8f5e2;
+  border: 1px solid #a5d6a7;
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--gruen-dunkel);
+}
+.nachkultur-box strong { display: block; margin-bottom: 0.5rem; }
+.nachkultur-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem; }
+
 .planung-layout { display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; align-items: start; }
 
 .wunschliste-karte {
